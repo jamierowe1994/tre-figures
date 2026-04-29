@@ -1,0 +1,12 @@
+{
+  "name": "tre-figures",
+  "version": "1.0.0",
+  "description": "TRE Recruitment Performance Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

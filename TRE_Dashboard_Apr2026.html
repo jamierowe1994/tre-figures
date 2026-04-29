@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRE Recruitment — Performance Dashboard · Apr 2026</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridjs@5.0.2/dist/theme/mermaid.min.css" integrity="sha384-jZvDSsmGB9oGGT/4l9bHXGoAv1OxvG/cFmSo0dZaSqmBgvQTKDBFAMftlXTmMbNW" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/gridjs@5.0.2/dist/gridjs.umd.js" integrity="sha384-/XXDzxe4FsGiAe50i/u9pY/Vy/uX654MHB1xoc1BJNnH1WXHhqHga9g3q5tF4gj7" crossorigin="anonymous"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f2f5;color:#1a1a2e;font-size:14px}
+
+  .brand-bar{background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);color:#fff;padding:20px 32px;display:flex;align-items:center;justify-content:space-between}
+  .brand-logo{font-size:22px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  .brand-logo span{color:#2ecc71}
+  .brand-tagline{font-size:11px;color:#8899bb;margin-top:3px;letter-spacing:.5px;text-transform:uppercase}
+  .brand-meta{text-align:right}
+  .brand-meta-title{font-size:13px;font-weight:600;color:#e0e6f0}
+  .brand-meta-date{font-size:11px;color:#8899bb;margin-top:3px}
+
+  .tab-nav{background:#fff;border-bottom:2px solid #e5e7eb;padding:0 32px;display:flex;gap:4px}
+  .tab-btn{padding:14px 20px;font-size:13px;font-weight:600;color:#6b7280;border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s;letter-spacing:.2px}
+  .tab-btn:hover{color:#1a1a2e;background:#f9fafb}
+  .tab-btn.active{color:#1a1a2e;border-bottom-color:#2ecc71}
+
+  .tab-content{display:none;padding:28px 32px;max-width:1200px;margin:0 auto}
+  .tab-content.active{display:block}
+
+  .section-heading{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#9ca3af;margin-bottom:14px}
+
+  .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  .kpi{background:#fff;border-radius:12px;padding:18px 20px;border:1px solid #e5e7eb;position:relative;overflow:hidden}
+  .kpi::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:#e5e7eb}
+  .kpi-good::before{background:#2ecc71}
+  .kpi-warn::before{background:#f59e0b}
+  .kpi-bad::before{background:#ef4444}
+  .kpi-blue::before{background:#3b82f6}
+  .kpi-label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;font-weight:600}
+  .kpi-value{font-size:24px;font-weight:800;color:#1a1a2e;line-height:1}
+  .kpi-good .kpi-value{color:#16a34a}
+  .kpi-warn .kpi-value{color:#d97706}
+  .kpi-blue .kpi-value{color:#2563eb}
+  .kpi-sub{font-size:11px;color:#9ca3af;margin-top:6px}
+
+  .panel{background:#fff;border-radius:12px;border:1px solid #e5e7eb;margin-bottom:18px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .panel-header{padding:16px 20px;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;background:#fafafa}
+  .panel-title{font-size:13px;font-weight:700;color:#1a1a2e;letter-spacing:.1px}
+  .panel-hint{font-size:11px;color:#9ca3af}
+  .panel-body{padding:18px 20px}
+
+  .chart-wrap{position:relative;height:270px}
+  .pipe-chart-wrap{height:210px;position:relative}
+
+  .concern{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid #f3f4f6}
+  .concern:last-child{border-bottom:none}
+  .concern-dot{width:9px;height:9px;border-radius:50%;margin-top:4px;flex-shrink:0}
+  .dot-green{background:#16a34a}.dot-amber{background:#d97706}.dot-red{background:#dc2626}.dot-grey{background:#9ca3af}
+  .concern-text{font-size:12px;line-height:1.6;color:#374151}
+
+  .progress-wrap{background:#f3f4f6;border-radius:99px;height:14px;overflow:hidden;margin:10px 0 4px}
+  .progress-bar{height:100%;border-radius:99px;transition:width .5s}
+  .bar-amber{background:linear-gradient(90deg,#d97706,#f59e0b)}
+
+  .month-compare{display:flex;gap:14px;margin-top:18px}
+  .compare-box{flex:1;background:#f9fafb;border-radius:10px;padding:14px;border:1px solid #e5e7eb}
+  .compare-label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#9ca3af;margin-bottom:6px;font-weight:600}
+  .compare-val{font-size:22px;font-weight:800;color:#1a1a2e}
+  .compare-sub{font-size:11px;color:#6b7280;margin-top:3px}
+  .delta-up{color:#16a34a}
+
+  .month-table{width:100%;border-collapse:collapse;font-size:13px}
+  .month-table th{text-align:left;padding:9px 12px;color:#6b7280;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid #f3f4f6;background:#fafafa}
+  .month-table td{padding:10px 12px;border-bottom:1px solid #f3f4f6}
+  .month-table tr:last-child td{border-bottom:none}
+  .month-table tr:hover td{background:#f9fafb}
+  .zero-row td{color:#d1d5db}
+  .rank-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#f3f4f6;font-size:11px;font-weight:700;color:#6b7280}
+  .rank-1{background:#fef3c7;color:#92400e}.rank-2{background:#f1f5f9;color:#475569}.rank-3{background:#fdf2f8;color:#9d174d}
+
+  .tenure-badge{display:inline-block;font-size:10px;font-weight:600;padding:1px 6px;border-radius:4px;margin-left:5px;vertical-align:middle}
+  .tenure-partial{background:#fef3c7;color:#92400e}
+  .tenure-left{background:#fee2e2;color:#991b1b}
+
+  .report-footer{text-align:center;padding:28px 32px;font-size:11px;color:#9ca3af;border-top:1px solid #e5e7eb;background:#fff;margin-top:32px}
+  .report-footer strong{color:#6b7280}
+
+  .gridjs-wrapper{border:none!important;box-shadow:none!important}
+  .gridjs-table{width:100%}
+  .gridjs-th{background:#fafafa!important;font-size:10px!important;text-transform:uppercase!important;letter-spacing:.5px!important;color:#6b7280!important;font-weight:700!important;padding:10px 14px!important}
+  .gridjs-td{font-size:13px!important;padding:11px 14px!important}
+  .gridjs-tr:hover .gridjs-td{background:#f9fafb!important}
+  .gridjs-head,.gridjs-footer{border:none!important}
+</style>
+</head>
+<body>
+
+<div class="brand-bar">
+  <div>
+    <div class="brand-logo">TRE <span>Recruitment</span></div>
+    <div class="brand-tagline">The Recruitment Experts</div>
+  </div>
+  <div class="brand-meta">
+    <div class="brand-meta-title">Performance Dashboard</div>
+    <div class="brand-meta-date">6-Month Review &nbsp;·&nbsp; November 2025 – April 2026</div>
+  </div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('leaderboard',this)">📊 &nbsp;6-Month Leaderboard</button>
+  <button class="tab-btn" onclick="switchTab('current',this)">📅 &nbsp;Current Month</button>
+  <button class="tab-btn" onclick="switchTab('pipeline',this)">💰 &nbsp;Invoice Pipeline</button>
+</div>
+
+<!-- TAB 1: LEADERBOARD -->
+<div id="tab-leaderboard" class="tab-content active">
+  <div class="section-heading">Key Performance Indicators · Nov 2025 – Apr 2026</div>
+  <div class="kpi-grid">
+    <div class="kpi kpi-good"><div class="kpi-label">Total Revenue Banked</div><div class="kpi-value">£152,540</div><div class="kpi-sub">Across 6 months</div></div>
+    <div class="kpi"><div class="kpi-label">Total Placements</div><div class="kpi-value">49</div><div class="kpi-sub">Across 9 active billers</div></div>
+    <div class="kpi kpi-warn"><div class="kpi-label">Company Avg Fee</div><div class="kpi-value">£3,113</div><div class="kpi-sub">Per placement</div></div>
+    <div class="kpi kpi-blue"><div class="kpi-label">Monthly Average</div><div class="kpi-value">£25,423</div><div class="kpi-sub">Revenue per month</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 360px;gap:18px">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Billing Leaderboard — Nov 2025 to Apr 2026</span>
+        <span class="panel-hint">Avg/Month based on actual months active · click columns to sort</span>
+      </div>
+      <div class="panel-body" style="padding:8px 0"><div id="leaderboard-table"></div></div>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-title">Average Fee per Recruiter</span>
+          <span class="panel-hint" style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:10px;border-top:2px dashed #d97706"></span>co. avg</span>
+        </div>
+        <div class="panel-body"><div class="chart-wrap"><canvas id="feeChart"></canvas></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header"><span class="panel-title">Highlights & Performance Notes</span></div>
+    <div class="panel-body" style="padding:8px 20px">
+      <div class="concern"><div class="concern-dot dot-green"></div><div class="concern-text"><strong>Alex Daniel leads the business with £40,500 across 15 placements</strong> — the highest deal count on the team, consistently active across all 6 months.</div></div>
+      <div class="concern"><div class="concern-dot dot-green"></div><div class="concern-text"><strong>Will Miles delivers the highest average fee at £4,204</strong> — 35% above the company average — demonstrating strong premium placement ability.</div></div>
+      <div class="concern"><div class="concern-dot dot-green"></div><div class="concern-text"><strong>Warren & Lewis have placed 9 candidates as a combined team unit</strong>, contributing £25,135 — a consistent and reliable pairing.</div></div>
+      <div class="concern"><div class="concern-dot dot-amber"></div><div class="concern-text"><strong>Monthly revenue average of £25,423</strong> sits below the £31,000 monthly target. Clear growth opportunity of ~£5,577/month.</div></div>
+      <div class="concern"><div class="concern-dot dot-amber"></div><div class="concern-text"><strong>Tawana Chin started February 2026</strong> — only 3 months in the window. Recalculated avg/month is £917, a more accurate indicator of her current run rate.</div></div>
+      <div class="concern"><div class="concern-dot dot-amber"></div><div class="concern-text"><strong>James started December 2025</strong> — 5 months in the window. Recalculated avg/month is £200. Low deal count; one to monitor.</div></div>
+      <div class="concern"><div class="concern-dot dot-grey"></div><div class="concern-text"><strong>Aston is no longer with the business</strong> — their 3 deals and £10,600 are included in the 6-month total but excluded from forward planning.</div></div>
+      <div class="concern"><div class="concern-dot dot-red"></div><div class="concern-text"><strong>David has billed only once in 6 months</strong> at £2,000 — avg/month of £333 needs to improve significantly.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 2: CURRENT MONTH -->
+<div id="tab-current" class="tab-content">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px">
+    <div><h2 style="font-size:20px;font-weight:800;color:#1a1a2e">April 2026</h2><div style="font-size:12px;color:#9ca3af;margin-top:3px">Deals agreed this month &nbsp;·&nbsp; Monthly target: £31,000</div></div>
+    <div style="background:#dcfce7;color:#166534;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700">↑ +51% vs last month</div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi kpi-warn"><div class="kpi-label">Revenue Banked (Apr)</div><div class="kpi-value">£29,200</div><div class="kpi-sub">94.2% of £31k target</div></div>
+    <div class="kpi"><div class="kpi-label">Placements This Month</div><div class="kpi-value">10</div><div class="kpi-sub">Across 4 active billers</div></div>
+    <div class="kpi kpi-good"><div class="kpi-label">vs March 2026</div><div class="kpi-value delta-up">+£9,900</div><div class="kpi-sub">Up from £19,300 in March</div></div>
+    <div class="kpi kpi-warn"><div class="kpi-label">Gap to Target</div><div class="kpi-value">£1,800</div><div class="kpi-sub">One placement short</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">April 2026 — Target Tracker</span></div>
+      <div class="panel-body">
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:4px"><span>Progress to £31,000 target</span><span style="font-weight:700;color:#d97706">94.2%</span></div>
+        <div class="progress-wrap"><div class="progress-bar bar-amber" style="width:94.2%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;margin-top:4px"><span>£0</span><span style="color:#d97706;font-weight:700">£29,200 banked</span><span>£31,000 target</span></div>
+        <div style="margin-top:22px"><div class="section-heading">April breakdown by recruiter</div>
+          <table class="month-table"><thead><tr><th style="width:28px"></th><th>Recruiter</th><th style="text-align:right">Deals</th><th style="text-align:right">Revenue</th><th style="text-align:right">Avg Fee</th></tr></thead><tbody id="apr-table-body"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><span class="panel-title">Month-on-Month Comparison</span></div>
+      <div class="panel-body">
+        <div class="month-compare">
+          <div class="compare-box"><div class="compare-label">March 2026</div><div class="compare-val">£19,300</div><div class="compare-sub">7 placements · 62.3% of target</div></div>
+          <div style="display:flex;align-items:center;justify-content:center;padding:0 8px"><div style="font-size:24px;color:#16a34a;font-weight:800">→</div></div>
+          <div class="compare-box" style="border-color:#2ecc71;background:#f0fdf4"><div class="compare-label">April 2026</div><div class="compare-val">£29,200</div><div class="compare-sub">10 placements · 94.2% of target</div></div>
+        </div>
+        <div style="margin-top:20px"><div class="section-heading">March 2026 breakdown</div>
+          <table class="month-table"><thead><tr><th>Recruiter</th><th style="text-align:right">Deals</th><th style="text-align:right">Revenue</th></tr></thead><tbody id="mar-table-body"></tbody></table>
+        </div>
+        <div style="margin-top:16px;padding:14px;background:#fff7ed;border-radius:10px;border-left:4px solid #f59e0b">
+          <div style="font-size:12px;color:#92400e;font-weight:700">⚠ April just missed the £31k target by £1,800</div>
+          <div style="font-size:11px;color:#b45309;margin-top:4px;line-height:1.5">A strong 51% improvement on March. One additional mid-range placement would have cleared the monthly target.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB 3: INVOICE PIPELINE -->
+<div id="tab-pipeline" class="tab-content">
+  <div style="margin-bottom:22px">
+    <h2 style="font-size:20px;font-weight:800;color:#1a1a2e">Invoice Pipeline</h2>
+    <div style="font-size:12px;color:#9ca3af;margin-top:3px">Revenue grouped by payment due date, based on candidate start dates + agreed payment terms</div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi kpi-good"><div class="kpi-label">May 2026 Pipeline</div><div class="kpi-value">£23,300</div><div class="kpi-sub">7 invoices confirmed for May</div></div>
+    <div class="kpi kpi-blue"><div class="kpi-label">April Invoiced</div><div class="kpi-value">£28,890</div><div class="kpi-sub">8 invoices — current month</div></div>
+    <div class="kpi"><div class="kpi-label">Future Confirmed (May+)</div><div class="kpi-value">£28,200</div><div class="kpi-sub">Dated placements, confirmed</div></div>
+    <div class="kpi kpi-warn"><div class="kpi-label">Unscheduled / Delayed</div><div class="kpi-value">£15,700</div><div class="kpi-sub">6 placements — date TBC</div></div>
+  </div>
+  <div class="panel" style="margin-bottom:18px">
+    <div class="panel-header">
+      <span class="panel-title">Monthly Invoice Totals — by Payment Due Date</span>
+      <div style="display:flex;align-items:center;gap:16px;font-size:11px;color:#9ca3af">
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#d1fae5"></span>Past</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#f59e0b"></span>Current</span>
+        <span style="display:flex;align-items:center;gap:5px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#3b82f6"></span>Upcoming</span>
+      </div>
+    </div>
+    <div class="panel-body"><div class="pipe-chart-wrap"><canvas id="pipeChart"></canvas></div></div>
+  </div>
+  <div class="section-heading">Deal breakdown by month — click any row to expand</div>
+  <div id="pipeline-cards"></div>
+  <div style="margin-top:12px;padding:14px 18px;background:#fff;border-radius:10px;border:1px solid #fef3c7;font-size:12px;color:#92400e;line-height:1.6">
+    <strong>Note on paid status:</strong> The "Paid" indicator reflects entries marked in the source spreadsheet. Several past invoices may have been settled but not yet updated — please cross-reference with your accounts for a definitive view.
+  </div>
+</div>
+
+<div class="report-footer">
+  <strong>TRE Recruitment — The Recruitment Experts</strong> &nbsp;·&nbsp;
+  Performance Dashboard &nbsp;·&nbsp; November 2025 – April 2026 &nbsp;·&nbsp;
+  Generated April 29, 2026 &nbsp;·&nbsp; Confidential
+</div>
+
+<script>
+const CO_AVG = 3113;
+const rows = [
+  { name:'Alex Daniel',    deals:15, total:40500, min:2000, avg:2700, mo:6750, months:6, left:false },
+  { name:'Will Miles',     deals:9,  total:37840, min:2400, avg:4204, mo:6307, months:6, left:false },
+  { name:'Warren & Lewis', deals:9,  total:25135, min:2500, avg:2793, mo:4189, months:6, left:false },
+  { name:'Patrice',        deals:5,  total:16675, min:2700, avg:3335, mo:2779, months:6, left:false },
+  { name:'Leena',          deals:5,  total:16040, min:2800, avg:3208, mo:2673, months:6, left:false },
+  { name:'Aston',          deals:3,  total:10600, min:2500, avg:3533, mo:1767, months:6, left:true  },
+  { name:'Tawana Chin',    deals:1,  total:2750,  min:2750, avg:2750, mo:917,  months:3, left:false },
+  { name:'David',          deals:1,  total:2000,  min:2000, avg:2000, mo:333,  months:6, left:false },
+  { name:'James',          deals:1,  total:1000,  min:1000, avg:1000, mo:200,  months:5, left:false },
+];
+const aprRows = [
+  { name:'Alex Daniel',    deals:5, total:14500, avg:2900 },
+  { name:'Will Miles',     deals:2, total:6150,  avg:3075 },
+  { name:'Warren & Lewis', deals:2, total:5300,  avg:2650 },
+  { name:'Patrice',        deals:1, total:3250,  avg:3250 },
+  { name:'Leena',          deals:0, total:0,     avg:0    },
+  { name:'Aston',          deals:0, total:0,     avg:0    },
+  { name:'Tawana Chin',    deals:0, total:0,     avg:0    },
+  { name:'David',          deals:0, total:0,     avg:0    },
+  { name:'James',          deals:0, total:0,     avg:0    },
+];
+const marRows = [
+  { name:'Warren & Lewis', deals:2, total:5750 },
+  { name:'Patrice',        deals:1, total:3500 },
+  { name:'Leena',          deals:1, total:2800 },
+  { name:'Tawana Chin',    deals:1, total:2750 },
+  { name:'Will Miles',     deals:1, total:2500 },
+  { name:'Alex Daniel',    deals:1, total:2000 },
+];
+const pipelineMonths = [
+  { month:'November 2025', sort:'2025-11', status:'past', total:4900, deals:2, paid:0, rows:[{c:'Saskia Bailey',r:'Will Miles',n:3900,s:'pending'},{c:'Matthew',r:'James',n:1000,s:'pending'}]},
+  { month:'December 2025', sort:'2025-12', status:'past', total:15490, deals:4, paid:0, rows:[{c:'Tom Smallwood',r:'Alex Daniel',n:2000,s:'pending'},{c:'Monika Rea',r:'Will Miles',n:7150,s:'pending'},{c:'Dami Okeowo',r:'Patrice',n:2700,s:'pending'},{c:'Tayo Rodney',r:'Will Miles',n:3640,s:'pending'}]},
+  { month:'January 2026', sort:'2026-01', status:'past', total:22205, deals:7, paid:0, rows:[{c:'Owen Smith',r:'Alex Daniel',n:2700,s:'pending'},{c:'James Gibbon',r:'Aston',n:3900,s:'pending'},{c:'Gags Kohli',r:'Warren & Lewis',n:2805,s:'pending'},{c:'Nathan Adams',r:'Warren & Lewis',n:2600,s:'pending'},{c:'Claire Harrington',r:'Alex Daniel',n:4000,s:'pending'},{c:'Karla Ashun',r:'Leena',n:3200,s:'pending'},{c:'Sukhdeep Kaur',r:'Warren & Lewis',n:3000,s:'pending'}]},
+  { month:'February 2026', sort:'2026-02', status:'past', total:27955, deals:9, paid:0, rows:[{c:'Richard Foster',r:'Leena',n:3200,s:'pending'},{c:'Lauren Edmunds',r:'Alex Daniel',n:2000,s:'pending'},{c:'Andrew Markham',r:'David',n:2000,s:'pending'},{c:'Kayleigh Faulkner',r:'Patrice',n:2850,s:'pending'},{c:'Jessica Arrowsmith',r:'Alex Daniel',n:4200,s:'pending'},{c:'Ivy Leung',r:'Will Miles',n:2500,s:'pending'},{c:'Hila Rusin',r:'Patrice',n:4375,s:'pending'},{c:'Simeon Emanus',r:'Will Miles',n:3750,s:'pending'},{c:'Thomas Phillips',r:'Warren & Lewis',n:3080,s:'pending'}]},
+  { month:'March 2026', sort:'2026-03', status:'past', total:9200, deals:4, paid:2000, rows:[{c:'Iman Singh',r:'Alex Daniel',n:2200,s:'pending'},{c:'Madison Collingham',r:'Warren & Lewis',n:2600,s:'pending'},{c:'Gagandeep Nangpal',r:'Alex Daniel',n:2400,s:'pending'},{c:'Neve Taylor',r:'Alex Daniel',n:2000,s:'paid'}]},
+  { month:'April 2026', sort:'2026-04', status:'current', total:28890, deals:8, paid:3200, rows:[{c:'Chanea Blackburn',r:'Leena',n:3480,s:'pending'},{c:'Stuart Latham',r:'Leena',n:3360,s:'pending'},{c:'Tracy McNulty',r:'Warren & Lewis',n:2550,s:'pending'},{c:'Derron Solomon',r:'Tawana Chin',n:2750,s:'pending'},{c:'Chuck Raphael',r:'Leena',n:2800,s:'pending'},{c:'Hyrije Taipi',r:'Will Miles',n:8250,s:'pending'},{c:'Yazmin Bryant',r:'Alex Daniel',n:2500,s:'pending'},{c:'Kleo Shorthose',r:'Warren & Lewis',n:3200,s:'paid'}]},
+  { month:'May 2026', sort:'2026-05', status:'future', total:23300, deals:7, paid:0, rows:[{c:'George Virtopeanu',r:'Patrice',n:3500,s:'pending'},{c:'Thomas Hayden',r:'Alex Daniel',n:3000,s:'pending'},{c:'Abbie Richards',r:'Warren & Lewis',n:2500,s:'pending'},{c:'Shannon Sweet',r:'Warren & Lewis',n:2800,s:'pending'},{c:'Denise De Sousa',r:'Will Miles',n:3750,s:'pending'},{c:'Lisa Harvey',r:'Alex Daniel',n:4500,s:'pending'},{c:'Aaron Arunan',r:'Patrice',n:3250,s:'pending'}]},
+  { month:'June 2026', sort:'2026-06', status:'future', total:2500, deals:1, paid:0, rows:[{c:'Riley Homes',r:'Alex Daniel',n:2500,s:'pending'}]},
+  { month:'August 2026', sort:'2026-08', status:'future', total:2400, deals:1, paid:0, rows:[{c:'Neah Banberry-Duhaney',r:'Will Miles',n:2400,s:'pending'}]},
+  { month:'No Date / Delayed', sort:'9999-99', status:'tbc', total:15700, deals:6, paid:0, rows:[{c:'Celina Hovsepian',r:'Will Miles',n:2500,s:'delayed'},{c:'Robin Peters',r:'Alex Daniel',n:2000,s:'pending'},{c:'Jamie Warwick',r:'Aston',n:2500,s:'pending'},{c:'Charlotte Cobbing',r:'Aston',n:4200,s:'pending'},{c:'Eugene Doyle',r:'Alex Daniel',n:2500,s:'pending'},{c:'millie kokes',r:'Alex Daniel',n:2000,s:'pending'}]},
+];
+
+function fmt(n){ return '£'+Math.round(n).toLocaleString('en-GB'); }
+function nameCell(r){
+  if(r.left) return r.name+`<span class="tenure-badge tenure-left">Left</span>`;
+  if(r.months<6) return r.name+`<span class="tenure-badge tenure-partial">${r.months}/6 mo</span>`;
+  return r.name;
+}
+
+new gridjs.Grid({
+  columns:[
+    {name:'#',width:'44px',formatter:(c)=>gridjs.html(`<span class="rank-badge rank-${c}">${c}</span>`)},
+    {name:'Recruiter',width:'190px',formatter:(c)=>gridjs.html(c)},
+    {name:'Placements',width:'95px',sort:{compare:(a,b)=>a-b}},
+    {name:'Total Revenue',sort:{compare:(a,b)=>parseInt(a.replace(/[^0-9]/g,''))-parseInt(b.replace(/[^0-9]/g,''))}},
+    {name:'Min Fee'},{name:'Avg Fee'},
+    {name:'Avg / Month',sort:{compare:(a,b)=>parseInt(a.replace(/[^0-9]/g,''))-parseInt(b.replace(/[^0-9]/g,''))}},
+  ],
+  data:rows.map((r,i)=>[i+1,nameCell(r),r.deals,fmt(r.total),fmt(r.min),fmt(r.avg),fmt(r.mo)]),
+  sort:true,
+}).render(document.getElementById('leaderboard-table'));
+
+const avgLinePlugin={id:'avgLine',afterDraw(chart){const{ctx,scales:{x,y}}=chart;const px=x.getPixelForValue(CO_AVG);ctx.save();ctx.beginPath();ctx.setLineDash([5,4]);ctx.strokeStyle='#d97706';ctx.lineWidth=1.5;ctx.moveTo(px,y.top);ctx.lineTo(px,y.bottom);ctx.stroke();ctx.font='10px -apple-system,sans-serif';ctx.fillStyle='#d97706';ctx.textAlign='left';ctx.fillText('co. avg',px+4,y.top+12);ctx.restore();}};
+new Chart(document.getElementById('feeChart'),{type:'bar',plugins:[avgLinePlugin],data:{labels:rows.map(r=>r.name),datasets:[{label:'Avg Fee (£)',data:rows.map(r=>Math.round(r.avg)),backgroundColor:rows.map(r=>r.left?'#e5e7eb':r.avg>=CO_AVG?'rgba(46,204,113,0.85)':'rgba(249,115,22,0.8)'),borderRadius:5,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' £'+c.raw.toLocaleString('en-GB')}}},scales:{x:{grid:{color:'#f3f4f6'},ticks:{callback:v=>'£'+v.toLocaleString('en-GB'),font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+
+function buildMonthTable(tbodyId,data,showAvg){const tbody=document.getElementById(tbodyId);let rank=1;data.forEach(r=>{const tr=document.createElement('tr');if(r.deals===0)tr.className='zero-row';tr.innerHTML=`<td><span class="rank-badge ${r.deals>0?'rank-'+rank:''}">${r.deals>0?rank++:'-'}</span></td><td>${r.name}</td><td style="text-align:right;font-weight:600">${r.deals||'—'}</td><td style="text-align:right;font-weight:700;color:${r.total>0?'#1a1a2e':'#d1d5db'}">${r.total>0?fmt(r.total):'—'}</td>${showAvg?`<td style="text-align:right;color:#6b7280">${r.avg>0?fmt(r.avg):'—'}</td>`:''} `;tbody.appendChild(tr);});}
+buildMonthTable('apr-table-body',aprRows,true);
+buildMonthTable('mar-table-body',marRows,false);
+
+const container=document.getElementById('pipeline-cards');
+const statusMeta={past:{label:'Past',style:'background:#f3f4f6;color:#6b7280'},current:{label:'Current',style:'background:#dbeafe;color:#1d4ed8'},future:{label:'Upcoming',style:'background:#dcfce7;color:#166534'},tbc:{label:'TBC',style:'background:#fef3c7;color:#92400e'}};
+pipelineMonths.forEach((m,idx)=>{const outstanding=m.total-m.paid;const sm=statusMeta[m.status];const card=document.createElement('div');card.className='panel';card.style.marginBottom='10px';card.innerHTML=`<div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="togglePipe(${idx})"><div><div style="display:flex;align-items:center;gap:9px"><span style="font-size:14px;font-weight:700;color:#1a1a2e">${m.month}</span><span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.5px;${sm.style}">${sm.label}</span></div><div style="font-size:11px;color:#9ca3af;margin-top:4px">${m.deals} placement${m.deals!==1?'s':''} &nbsp;·&nbsp; Outstanding: ${outstanding>0?fmt(outstanding):'All clear ✓'}</div></div><div style="text-align:right;display:flex;align-items:center;gap:16px"><div style="font-size:22px;font-weight:800;color:${m.status==='future'?'#2563eb':m.status==='current'?'#d97706':'#1a1a2e'}">${fmt(m.total)}</div><div style="font-size:18px;color:#d1d5db">▾</div></div></div><div id="pipe-deals-${idx}" style="display:none;border-top:1px solid #f3f4f6"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#fafafa"><th style="text-align:left;padding:9px 20px;color:#6b7280;font-weight:700;font-size:10px;text-transform:uppercase">Candidate</th><th style="text-align:left;padding:9px 14px;color:#6b7280;font-weight:700;font-size:10px;text-transform:uppercase">Recruiter</th><th style="text-align:right;padding:9px 14px;color:#6b7280;font-weight:700;font-size:10px;text-transform:uppercase">Net Fee</th><th style="text-align:right;padding:9px 20px;color:#6b7280;font-weight:700;font-size:10px;text-transform:uppercase">Status</th></tr></thead><tbody>${m.rows.map(r=>`<tr style="border-bottom:1px solid #f9fafb"><td style="padding:10px 20px;color:#374151">${r.c}</td><td style="padding:10px 14px;color:#6b7280">${r.r}</td><td style="padding:10px 14px;text-align:right;font-weight:700;color:#1a1a2e">${fmt(r.n)}</td><td style="padding:10px 20px;text-align:right"><span style="font-size:11px;font-weight:700;color:${r.s==='paid'?'#16a34a':r.s==='delayed'?'#d97706':'#9ca3af'}">${r.s==='paid'?'✓ Paid':r.s==='delayed'?'⚠ Delayed':'Pending'}</span></td></tr>`).join('')}</tbody><tfoot><tr style="background:#fafafa"><td colspan="2" style="padding:10px 20px;font-weight:700;font-size:12px">Month Total</td><td style="padding:10px 14px;text-align:right;font-weight:800;font-size:14px;color:#1a1a2e">${fmt(m.total)}</td><td style="padding:10px 20px;text-align:right;font-size:11px;color:#16a34a;font-weight:700">${m.paid>0?fmt(m.paid)+' confirmed paid':''}</td></tr></tfoot></table></div>`;container.appendChild(card);});
+function togglePipe(idx){const el=document.getElementById('pipe-deals-'+idx);el.style.display=el.style.display==='none'?'block':'none';}
+
+const visMonths=pipelineMonths.filter(m=>m.sort!=='9999-99');
+new Chart(document.getElementById('pipeChart'),{type:'bar',data:{labels:visMonths.map(m=>m.month.replace(' 20'," '")),datasets:[{label:'Invoice Total (£)',data:visMonths.map(m=>m.total),backgroundColor:visMonths.map(m=>m.status==='future'?'rgba(59,130,246,0.8)':m.status==='current'?'rgba(245,158,11,0.85)':'rgba(209,250,229,0.9)'),borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' £'+c.raw.toLocaleString('en-GB')}}},scales:{x:{grid:{display:false},ticks:{font:{size:11}}},y:{grid:{color:'#f3f4f6'},ticks:{callback:v=>'£'+v.toLocaleString('en-GB'),font:{size:10}},beginAtZero:true}}}});
+
+function switchTab(tabId,btn){document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));document.getElementById('tab-'+tabId).classList.add('active');btn.classList.add('active');setTimeout(()=>{Chart.instances&&Object.values(Chart.instances).forEach(c=>c.resize&&c.resize())},50);}
+</script>
+</body>
+</html>
