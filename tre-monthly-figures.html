@@ -3,514 +3,581 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TRE — April 2026 Monthly Figures</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<title>tre. — April 2026 Monthly Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    background: #f0f2f5;
-    color: #1a1a2e;
-    font-size: 14px;
-    min-height: 100vh;
-  }
-  header {
-    background: #1a1a2e;
-    color: #fff;
-    padding: 18px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  header h1 { font-size: 18px; font-weight: 700; }
-  header .sub { font-size: 12px; color: #8899aa; margin-top: 3px; }
-  .badge {
-    background: #2ecc71;
-    color: #1a1a2e;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 999px;
-  }
-  main { padding: 28px 32px; max-width: 1100px; margin: 0 auto; }
-  section + section { margin-top: 28px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* KPI row */
-  .kpi-row {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-  }
-  .kpi {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px 22px;
-    border: 1px solid #e5e7eb;
-    position: relative;
-    overflow: hidden;
-  }
-  .kpi::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-  }
-  .kpi.green::before { background: #2ecc71; }
-  .kpi.blue::before  { background: #3b82f6; }
-  .kpi.amber::before { background: #f59e0b; }
-  .kpi-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 10px;
-  }
-  .kpi-value {
-    font-size: 32px;
-    font-weight: 800;
-    line-height: 1;
-  }
-  .kpi.green .kpi-value { color: #16a34a; }
-  .kpi.blue  .kpi-value { color: #1d4ed8; }
-  .kpi.amber .kpi-value { color: #d97706; }
-  .kpi-meta { margin-top: 8px; font-size: 12px; color: #9ca3af; }
-  .kpi-meta strong { color: #6b7280; }
+:root {
+  --bg:      #faf8f5;
+  --ink:     #252224;
+  --ink-mid: #6b6568;
+  --ink-lt:  #b0acaa;
+  --rule:    #e8e4df;
+  --card:    #ffffff;
+  --green:   #2a6644;
+  --green-lt:#e8f3ed;
+  --amber:   #8a5a1e;
+  --amber-lt:#f5ead8;
+  --blue:    #1e3f6a;
+  --blue-lt: #dce8f5;
+  --accent:  #c8a87a;
+}
 
-  /* Panels */
-  .panel {
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    overflow: hidden;
-  }
-  .panel-head {
-    padding: 14px 20px;
-    border-bottom: 1px solid #f3f4f6;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .panel-head h2 { font-size: 14px; font-weight: 700; }
-  .panel-head .hint { font-size: 11px; color: #9ca3af; }
-  .panel-body { padding: 20px; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
+}
 
-  /* Chart */
-  .chart-wrap { height: 240px; position: relative; }
+.header {
+  background: var(--ink);
+  padding: 24px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.tre-logo {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--bg);
+  letter-spacing: -0.5px;
+}
+.tre-logo span { color: var(--accent); }
+.header-meta { text-align: right; }
+.header-meta .month {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(250,248,245,0.5);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+}
+.header-meta .target-pill {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 2px;
+}
 
-  /* Month table */
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th {
-    text-align: left; padding: 9px 14px;
-    color: #6b7280; font-weight: 600; font-size: 11px;
-    text-transform: uppercase; letter-spacing: 0.4px;
-    border-bottom: 2px solid #f3f4f6;
-    background: #fafafa;
-  }
-  thead th:not(:first-child) { text-align: right; }
-  tbody td { padding: 11px 14px; border-bottom: 1px solid #f9fafb; }
-  tbody td:not(:first-child) { text-align: right; }
-  tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover td { background: #f9fafb; }
-  .month-label { font-weight: 600; color: #1a1a2e; }
-  .tag {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 999px;
-    margin-left: 6px;
-    vertical-align: middle;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-  }
-  .tag-past   { background: #f3f4f6; color: #6b7280; }
-  .tag-now    { background: #dcfce7; color: #166534; }
-  .tag-future { background: #dbeafe; color: #1d4ed8; }
-  .amount-cell { font-weight: 700; }
-  .amount-green { color: #16a34a; }
-  .amount-blue  { color: #1d4ed8; }
-  .amount-grey  { color: #9ca3af; }
-  tfoot td {
-    padding: 11px 14px;
-    background: #f9fafb;
-    font-weight: 700;
-    border-top: 2px solid #f3f4f6;
-    text-align: right;
-  }
-  tfoot td:first-child { text-align: left; }
+.hero {
+  background: var(--ink);
+  padding: 0 48px 36px;
+  border-bottom: 3px solid var(--accent);
+}
+.hero-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 48px;
+}
+.hero-main .label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(250,248,245,0.4);
+  margin-bottom: 6px;
+}
+.hero-main .value {
+  font-size: 64px;
+  font-weight: 900;
+  color: var(--bg);
+  letter-spacing: -2px;
+  line-height: 1;
+}
+.hero-main .sub {
+  font-size: 13px;
+  color: rgba(250,248,245,0.45);
+  margin-top: 6px;
+}
+.hero-divider {
+  width: 1px;
+  height: 70px;
+  background: rgba(250,248,245,0.12);
+}
+.hero-stats { display: flex; gap: 36px; }
+.hstat .val {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--bg);
+  letter-spacing: -0.5px;
+}
+.hstat .lbl {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: rgba(250,248,245,0.4);
+  margin-top: 3px;
+}
 
-  /* April deal list */
-  .deal-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-  .deal-card {
-    border: 1px solid #f3f4f6;
-    border-radius: 8px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .deal-name { font-weight: 600; font-size: 13px; color: #1a1a2e; }
-  .deal-rec  { font-size: 11px; color: #6b7280; margin-top: 2px; }
-  .deal-amt  { font-size: 15px; font-weight: 800; color: #16a34a; flex-shrink: 0; }
-  .deal-date { font-size: 10px; color: #9ca3af; margin-top: 2px; text-align: right; }
+.body {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 36px 24px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-  footer {
-    text-align: center;
-    padding: 20px;
-    font-size: 11px;
-    color: #9ca3af;
-  }
+.section-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2.5px;
+  color: var(--ink-lt);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.monthly-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.month-col {
+  background: var(--card);
+  padding: 20px 18px;
+  position: relative;
+}
+.month-col.current { background: var(--ink); }
+.month-col.current .mc-name,
+.month-col.current .mc-agreed-lbl,
+.month-col.current .mc-inv-lbl { color: rgba(250,248,245,0.45); }
+.month-col.current .mc-agreed-val { color: var(--bg); }
+.month-col.current .mc-inv-val { color: rgba(250,248,245,0.7); }
+.month-col.current .mc-divider { background: rgba(250,248,245,0.1); }
+.month-col.current .mc-delta { color: var(--accent); }
+
+.mc-name {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--ink-lt);
+  margin-bottom: 14px;
+}
+.mc-agreed-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--ink-lt);
+  margin-bottom: 3px;
+}
+.mc-agreed-val {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+  line-height: 1;
+}
+.mc-divider { height: 1px; background: var(--rule); margin: 12px 0; }
+.mc-inv-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--ink-lt);
+  margin-bottom: 3px;
+}
+.mc-inv-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink-mid);
+  letter-spacing: -0.3px;
+}
+.mc-bar-wrap {
+  margin-top: 14px;
+  height: 4px;
+  background: var(--rule);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.mc-bar { height: 100%; border-radius: 999px; background: var(--ink-lt); }
+.mc-bar.cur-bar { background: var(--accent); }
+.mc-delta { margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--ink-mid); }
+.mc-delta.up { color: var(--green); }
+.mc-delta.down { color: #b84040; }
+.mc-badge {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: var(--accent);
+  color: var(--ink);
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 3px 7px;
+  border-radius: 2px;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 16px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.card-head {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-title {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  color: var(--ink-mid);
+}
+.card-body { padding: 20px; }
+
+.biller-wrap { display: flex; flex-direction: column; gap: 16px; }
+.biller-crown {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.biller-name {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.biller-stats {
+  display: flex;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.bstat {
+  flex: 1;
+  padding: 12px 14px;
+  border-right: 1px solid var(--rule);
+  text-align: center;
+}
+.bstat:last-child { border-right: none; }
+.bstat-val { font-size: 18px; font-weight: 900; color: var(--ink); letter-spacing: -0.3px; }
+.bstat-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--ink-lt);
+  margin-top: 2px;
+}
+.share-label {
+  font-size: 11px;
+  color: var(--ink-mid);
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+.share-label strong { color: var(--ink); }
+.share-track { height: 6px; background: var(--rule); border-radius: 999px; overflow: hidden; }
+.share-fill { height: 100%; background: var(--accent); border-radius: 999px; }
+.top-deal {
+  padding: 10px 12px;
+  background: var(--bg);
+  border-radius: 3px;
+  font-size: 11.5px;
+  color: var(--ink-mid);
+  border: 1px solid var(--rule);
+}
+.top-deal strong { color: var(--ink); }
+
+.rec-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 62px 50px;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.rec-row:last-child { margin-bottom: 0; }
+.rec-name { font-size: 12px; font-weight: 600; color: var(--ink); }
+.rec-track { height: 8px; background: var(--bg); border-radius: 999px; overflow: hidden; border: 1px solid var(--rule); }
+.rec-fill { height: 100%; border-radius: 999px; }
+.rec-fill.r0 { background: var(--ink); }
+.rec-fill.r1 { background: #556b80; }
+.rec-fill.r2 { background: #8a8070; }
+.rec-fill.r3 { background: #a09095; }
+.rec-amount { font-size: 12px; font-weight: 700; color: var(--ink); text-align: right; }
+.rec-deals { font-size: 11px; color: var(--ink-lt); text-align: right; }
+.team-total {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--ink-mid);
+}
+.team-total strong { color: var(--ink); }
+
+.hl-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.hl { background: var(--card); padding: 18px; }
+.hl-icon { font-size: 18px; margin-bottom: 8px; }
+.hl-lbl {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+  color: var(--ink-lt);
+  margin-bottom: 5px;
+}
+.hl-val { font-size: 16px; font-weight: 900; color: var(--ink); letter-spacing: -0.3px; margin-bottom: 4px; }
+.hl-sub { font-size: 11px; color: var(--ink-mid); line-height: 1.4; }
+
+.footer {
+  background: var(--ink);
+  padding: 16px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-logo { font-size: 14px; font-weight: 900; color: rgba(250,248,245,0.35); letter-spacing: -0.3px; }
+.footer-logo span { color: var(--accent); }
+.footer-meta { font-size: 10.5px; color: rgba(250,248,245,0.3); }
 </style>
 </head>
 <body>
 
-<header>
-  <div>
-    <h1>TRE Recruitment — Monthly Figures</h1>
-    <div class="sub">April 2026 &nbsp;·&nbsp; Generated May 1, 2026</div>
+<div class="header">
+  <div class="tre-logo">tre<span>.</span></div>
+  <div class="header-meta">
+    <div class="month">Monthly Performance Report</div>
+    <div class="target-pill">128% of target &nbsp;·&nbsp; April 2026</div>
   </div>
-  <span class="badge">April 2026</span>
-</header>
+</div>
 
-<main>
-
-  <!-- KPI cards -->
-  <section class="kpi-row">
-    <div class="kpi green">
-      <div class="kpi-label">Revenue Banked — April</div>
-      <div class="kpi-value">£39,780</div>
-      <div class="kpi-meta"><strong>13 placements</strong> agreed in April &nbsp;·&nbsp; 4 recruiters</div>
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-main">
+      <div class="label">Total Revenue Agreed — April 2026</div>
+      <div class="value">£39,780</div>
+      <div class="sub">13 placements &nbsp;·&nbsp; 4 active billers &nbsp;·&nbsp; Best month of 2026</div>
     </div>
-    <div class="kpi blue">
-      <div class="kpi-label">Invoiced — April 2026</div>
-      <div class="kpi-value">£28,890</div>
-      <div class="kpi-meta"><strong>8 invoices</strong> raised with April payment dates</div>
-    </div>
-    <div class="kpi amber">
-      <div class="kpi-label">To Invoice — May 2026</div>
-      <div class="kpi-value">£31,800</div>
-      <div class="kpi-meta"><strong>10 invoices</strong> due in May &nbsp;·&nbsp; all from April placements</div>
-    </div>
-  </section>
-
-  <!-- Monthly breakdown chart + table -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2>Monthly Invoiced — January to May 2026</h2>
-      <span class="hint">Blue = upcoming · Green = invoiced</span>
-    </div>
-    <div class="panel-body">
-      <div class="chart-wrap">
-        <canvas id="monthChart"></canvas>
+    <div class="hero-divider"></div>
+    <div class="hero-stats">
+      <div class="hstat">
+        <div class="val">£28,890</div>
+        <div class="lbl">Invoiced April</div>
+      </div>
+      <div class="hstat">
+        <div class="val">£31,800</div>
+        <div class="lbl">To Invoice May</div>
+      </div>
+      <div class="hstat">
+        <div class="val">£3,060</div>
+        <div class="lbl">Average Fee</div>
+      </div>
+      <div class="hstat">
+        <div class="val">+£8,780</div>
+        <div class="lbl">Above Target</div>
       </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Month</th>
-          <th>Invoiced / Due</th>
-          <th>No. Invoices</th>
-          <th>vs Target (£31k)</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="month-label">January 2026</span><span class="tag tag-past">Past</span></td>
-          <td class="amount-cell">£22,205</td>
-          <td>7</td>
-          <td class="amount-grey">–£8,795</td>
-          <td><span style="font-size:11px;color:#6b7280">Invoiced</span></td>
-        </tr>
-        <tr>
-          <td><span class="month-label">February 2026</span><span class="tag tag-past">Past</span></td>
-          <td class="amount-cell">£27,955</td>
-          <td>9</td>
-          <td class="amount-grey">–£3,045</td>
-          <td><span style="font-size:11px;color:#6b7280">Invoiced</span></td>
-        </tr>
-        <tr>
-          <td><span class="month-label">March 2026</span><span class="tag tag-past">Past</span></td>
-          <td class="amount-cell" style="color:#dc2626">£9,200</td>
-          <td>4</td>
-          <td class="amount-grey" style="color:#dc2626">–£21,800</td>
-          <td><span style="font-size:11px;color:#6b7280">Invoiced</span></td>
-        </tr>
-        <tr style="background:#f0fdf4">
-          <td><span class="month-label">April 2026</span><span class="tag tag-now">This month</span></td>
-          <td class="amount-cell amount-green">£28,890</td>
-          <td>8</td>
-          <td class="amount-grey">–£2,110</td>
-          <td><span style="font-size:11px;color:#16a34a;font-weight:600">Invoiced</span></td>
-        </tr>
-        <tr style="background:#eff6ff">
-          <td><span class="month-label">May 2026</span><span class="tag tag-future">Upcoming</span></td>
-          <td class="amount-cell amount-blue">£31,800</td>
-          <td>10</td>
-          <td style="color:#16a34a;font-weight:600">+£800</td>
-          <td><span style="font-size:11px;color:#1d4ed8;font-weight:600">To Invoice</span></td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td>Total (Jan–May)</td>
-          <td>£120,045</td>
-          <td>38</td>
-          <td></td>
-          <td></td>
-        </tr>
-      </tfoot>
-    </table>
-  </section>
+  </div>
+</div>
 
-  <!-- April placements breakdown -->
-  <section class="panel">
-    <div class="panel-head">
-      <h2>April 2026 — All Placements (£39,780)</h2>
-      <span class="hint">13 deals agreed this month across 4 recruiters</span>
-    </div>
-    <div class="panel-body">
+<div class="body">
 
-      <!-- Recruiter summary -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px">
-          <div style="font-size:11px;color:#16a34a;font-weight:600;text-transform:uppercase;margin-bottom:4px">Alex Daniel</div>
-          <div style="font-size:20px;font-weight:800;color:#15803d">£18,580</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px">6 deals · avg £3,097</div>
-        </div>
-        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:14px">
-          <div style="font-size:11px;color:#1d4ed8;font-weight:600;text-transform:uppercase;margin-bottom:4px">Will Miles</div>
-          <div style="font-size:20px;font-weight:800;color:#1e40af">£12,650</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px">4 deals · avg £3,163</div>
-        </div>
-        <div style="background:#fefce8;border:1px solid #fde68a;border-radius:8px;padding:14px">
-          <div style="font-size:11px;color:#92400e;font-weight:600;text-transform:uppercase;margin-bottom:4px">Lewis</div>
-          <div style="font-size:20px;font-weight:800;color:#78350f">£5,300</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px">2 deals · avg £2,650</div>
-        </div>
-        <div style="background:#fdf4ff;border:1px solid #e9d5ff;border-radius:8px;padding:14px">
-          <div style="font-size:11px;color:#6b21a8;font-weight:600;text-transform:uppercase;margin-bottom:4px">Patrice</div>
-          <div style="font-size:20px;font-weight:800;color:#581c87">£3,250</div>
-          <div style="font-size:11px;color:#6b7280;margin-top:4px">1 deal · avg £3,250</div>
-        </div>
+  <div>
+    <div class="section-label">2026 Monthly Breakdown — Revenue Agreed &amp; Invoiced</div>
+    <div class="monthly-grid">
+
+      <div class="month-col">
+        <div class="mc-name">January</div>
+        <div class="mc-agreed-lbl">Agreed</div>
+        <div class="mc-agreed-val">£22,205</div>
+        <div class="mc-divider"></div>
+        <div class="mc-inv-lbl">Invoiced</div>
+        <div class="mc-inv-val">£22,205</div>
+        <div class="mc-bar-wrap"><div class="mc-bar" style="width:56%"></div></div>
+        <div class="mc-delta">7 invoices</div>
       </div>
 
-      <!-- Individual deals -->
-      <div class="deal-grid">
-        <div class="deal-card">
+      <div class="month-col">
+        <div class="mc-name">February</div>
+        <div class="mc-agreed-lbl">Agreed</div>
+        <div class="mc-agreed-val">£27,955</div>
+        <div class="mc-divider"></div>
+        <div class="mc-inv-lbl">Invoiced</div>
+        <div class="mc-inv-val">£27,955</div>
+        <div class="mc-bar-wrap"><div class="mc-bar" style="width:70%"></div></div>
+        <div class="mc-delta up">+£5,750 vs Jan</div>
+      </div>
+
+      <div class="month-col">
+        <div class="mc-name">March</div>
+        <div class="mc-agreed-lbl">Agreed</div>
+        <div class="mc-agreed-val">£9,200</div>
+        <div class="mc-divider"></div>
+        <div class="mc-inv-lbl">Invoiced</div>
+        <div class="mc-inv-val">£9,200</div>
+        <div class="mc-bar-wrap"><div class="mc-bar" style="width:23%;background:#b84040;opacity:0.5"></div></div>
+        <div class="mc-delta down">–£18,755 vs Feb</div>
+      </div>
+
+      <div class="month-col current">
+        <div class="mc-badge">★ Best</div>
+        <div class="mc-name">April</div>
+        <div class="mc-agreed-lbl">Agreed</div>
+        <div class="mc-agreed-val">£39,780</div>
+        <div class="mc-divider"></div>
+        <div class="mc-inv-lbl">Invoiced</div>
+        <div class="mc-inv-val">£28,890</div>
+        <div class="mc-bar-wrap"><div class="mc-bar cur-bar" style="width:100%"></div></div>
+        <div class="mc-delta">+£30,580 vs Mar</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="two-col">
+
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Top Biller</div>
+      </div>
+      <div class="card-body">
+        <div class="biller-wrap">
           <div>
-            <div class="deal-name">Yazmin Bryant</div>
-            <div class="deal-rec">Alex Daniel · Oakmans</div>
+            <div class="biller-crown">⭐ April 2026 #1</div>
+            <div class="biller-name">Alex<br>Daniel</div>
           </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£2,500</div>
-            <div class="deal-date">Pay 22/04/2026 ✓ Invoiced</div>
+          <div class="biller-stats">
+            <div class="bstat">
+              <div class="bstat-val">£18,580</div>
+              <div class="bstat-lbl">Revenue</div>
+            </div>
+            <div class="bstat">
+              <div class="bstat-val">6</div>
+              <div class="bstat-lbl">Deals</div>
+            </div>
+            <div class="bstat">
+              <div class="bstat-val">£3,097</div>
+              <div class="bstat-lbl">Avg Fee</div>
+            </div>
           </div>
-        </div>
-        <div class="deal-card">
           <div>
-            <div class="deal-name">Lisa Harvey</div>
-            <div class="deal-rec">Alex Daniel · Oulsnams</div>
+            <div class="share-label">
+              <span>Share of April revenue</span>
+              <strong>47%</strong>
+            </div>
+            <div class="share-track"><div class="share-fill" style="width:47%"></div></div>
           </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£4,500</div>
-            <div class="deal-date">Pay 15/05/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Thomas Hayden</div>
-            <div class="deal-rec">Alex Daniel · Oakmans</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£3,000</div>
-            <div class="deal-date">Pay 08/05/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Riley Homes</div>
-            <div class="deal-rec">Alex Daniel · Pointons</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£2,500</div>
-            <div class="deal-date">Pay 15/06/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Millie Kokes</div>
-            <div class="deal-rec">Alex Daniel · Arden Estates</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£2,000</div>
-            <div class="deal-date">Pay 25/05/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Kim Green</div>
-            <div class="deal-rec">Alex Daniel · Oakmans</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£4,080</div>
-            <div class="deal-date">Pay 15/06/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Denise De Sousa</div>
-            <div class="deal-rec">Will Miles · Samuel Estates</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£3,750</div>
-            <div class="deal-date">Pay 12/05/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Maxine Deacon</div>
-            <div class="deal-rec">Will Miles · Samuel Estates</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£3,000</div>
-            <div class="deal-date">Pay 18/05/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Missie Malik</div>
-            <div class="deal-rec">Will Miles · Cozee Properties</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£3,500</div>
-            <div class="deal-date">Pay 18/05/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Neah Banberry-Duhaney</div>
-            <div class="deal-rec">Will Miles · Martyn Gerrard</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£2,400</div>
-            <div class="deal-date">Pay 03/08/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Shannon Sweet</div>
-            <div class="deal-rec">Lewis · Cope &amp; Co</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£2,800</div>
-            <div class="deal-date">Pay 12/05/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Abbie Richards</div>
-            <div class="deal-rec">Lewis · O'Riordan Bond</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£2,500</div>
-            <div class="deal-date">Pay 08/05/2026</div>
-          </div>
-        </div>
-        <div class="deal-card">
-          <div>
-            <div class="deal-name">Aaron Arunan</div>
-            <div class="deal-rec">Patrice · First Mortgage</div>
-          </div>
-          <div style="text-align:right">
-            <div class="deal-amt">£3,250</div>
-            <div class="deal-date">Pay 18/05/2026</div>
+          <div class="top-deal">
+            Highest single fee: <strong>£4,500</strong> — Lisa Harvey at Oulsnams
           </div>
         </div>
       </div>
     </div>
-  </section>
 
-</main>
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">Team Breakdown</div>
+        <div style="font-size:11px;color:var(--ink-mid)">All 4 recruiters billed ✓</div>
+      </div>
+      <div class="card-body">
+        <div class="rec-row">
+          <div class="rec-name">Alex Daniel</div>
+          <div class="rec-track"><div class="rec-fill r0" style="width:100%"></div></div>
+          <div class="rec-amount">£18,580</div>
+          <div class="rec-deals">6 deals</div>
+        </div>
+        <div class="rec-row">
+          <div class="rec-name">Will Miles</div>
+          <div class="rec-track"><div class="rec-fill r1" style="width:68%"></div></div>
+          <div class="rec-amount">£12,650</div>
+          <div class="rec-deals">4 deals</div>
+        </div>
+        <div class="rec-row">
+          <div class="rec-name">Lewis</div>
+          <div class="rec-track"><div class="rec-fill r2" style="width:29%"></div></div>
+          <div class="rec-amount">£5,300</div>
+          <div class="rec-deals">2 deals</div>
+        </div>
+        <div class="rec-row">
+          <div class="rec-name">Patrice</div>
+          <div class="rec-track"><div class="rec-fill r3" style="width:17%"></div></div>
+          <div class="rec-amount">£3,250</div>
+          <div class="rec-deals">1 deal</div>
+        </div>
+        <div class="team-total">
+          <span>13 placements &nbsp;·&nbsp; 4 active billers</span>
+          <strong>£39,780</strong>
+        </div>
+      </div>
+    </div>
 
-<footer>TRE Recruitment · Monthly figures report · April 2026 · Generated May 1, 2026</footer>
+  </div>
 
-<script>
-const months = ['Jan 2026','Feb 2026','Mar 2026','Apr 2026','May 2026'];
-const invoiced = [22205, 27955, 9200, 28890, null];
-const upcoming = [null, null, null, null, 31800];
-const target = 31000;
+  <div>
+    <div class="section-label">April Highlights</div>
+    <div class="hl-grid">
+      <div class="hl">
+        <div class="hl-icon">📈</div>
+        <div class="hl-lbl">Best Month of 2026</div>
+        <div class="hl-val">+£11,825 on Feb</div>
+        <div class="hl-sub">Previous best was £27,955 in February. April smashes that by nearly £12k.</div>
+      </div>
+      <div class="hl">
+        <div class="hl-icon">🎯</div>
+        <div class="hl-lbl">Target Performance</div>
+        <div class="hl-val">128% achieved</div>
+        <div class="hl-sub">£8,780 above the £31k monthly goal. First month to clear target in 2026.</div>
+      </div>
+      <div class="hl">
+        <div class="hl-icon">📦</div>
+        <div class="hl-lbl">Deal Volume</div>
+        <div class="hl-val">13 placements</div>
+        <div class="hl-sub">Most deals in a single month this year. Full team on the board.</div>
+      </div>
+      <div class="hl">
+        <div class="hl-icon">🚀</div>
+        <div class="hl-lbl">May Already Loaded</div>
+        <div class="hl-val">£31,800 lined up</div>
+        <div class="hl-sub">10 April deals invoicing in May. Already above target before May begins.</div>
+      </div>
+    </div>
+  </div>
 
-new Chart(document.getElementById('monthChart'), {
-  type: 'bar',
-  data: {
-    labels: months,
-    datasets: [
-      {
-        label: 'Invoiced (£)',
-        data: invoiced,
-        backgroundColor: months.map((_, i) => i === 3 ? '#2ecc71' : '#d1fae5'),
-        borderRadius: 6,
-      },
-      {
-        label: 'To Invoice (£)',
-        data: upcoming,
-        backgroundColor: '#3b82f6',
-        borderRadius: 6,
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        callbacks: {
-          label: ctx => ' £' + (ctx.raw || 0).toLocaleString('en-GB')
-        }
-      },
-      annotation: {}
-    },
-    scales: {
-      x: { grid: { display: false }, ticks: { font: { size: 11 } } },
-      y: {
-        grid: { color: '#f3f4f6' },
-        ticks: {
-          callback: v => '£' + v.toLocaleString('en-GB'),
-          font: { size: 10 }
-        },
-        beginAtZero: true
-      }
-    }
-  },
-  plugins: [{
-    id: 'targetLine',
-    afterDraw(chart) {
-      const { ctx, scales: { y, x } } = chart;
-      const py = y.getPixelForValue(target);
-      ctx.save();
-      ctx.beginPath();
-      ctx.setLineDash([6, 4]);
-      ctx.strokeStyle = '#d97706';
-      ctx.lineWidth = 1.5;
-      ctx.moveTo(x.left, py);
-      ctx.lineTo(x.right, py);
-      ctx.stroke();
-      ctx.font = '10px -apple-system,sans-serif';
-      ctx.fillStyle = '#d97706';
-      ctx.textAlign = 'right';
-      ctx.fillText('£31k target', x.right - 4, py - 4);
-      ctx.restore();
-    }
-  }]
-});
-</script>
+</div>
+
+<div class="footer">
+  <div class="footer-logo">tre<span>.</span></div>
+  <div class="footer-meta">therecruitmentexperts.co.uk &nbsp;·&nbsp; April 2026 Monthly Report &nbsp;·&nbsp; Generated May 1, 2026</div>
+</div>
+
 </body>
 </html>
